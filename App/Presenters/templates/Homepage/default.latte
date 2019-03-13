@@ -11,4 +11,32 @@
 {if $user->isLoggedIn()}
     <p><a href="{plink Post:new}">Nový příspěvek</a></p>
 {/if}
-Zde bude nástěnka
+
+{if count($posts) === 0}
+    <p>Žádné příspěvky</p>
+{else}
+    {foreach $posts as $post}
+        <div>
+            <h3>
+                {if $post->getType() === 'demand'}
+                    Poptávka:
+                {elseif $post->getType() === 'offer'}
+                    Nabídka:
+                {elseif $post->getType() === 'other'}
+                    Ostatní:
+                {/if}
+                {$post->getTitle()}
+            </h3>
+            <p>{$post->getContent()}</p>
+            <p>
+                <small>
+                    Aktivní: {if $post->isActive()}ano{else}ne{/if}
+                    {if $post->getUser()->getId() === $user->getId()}
+                        <a href="{plink Post:toggle, $post->getId()}">{if $post->isActive()}zneaktivnit{else}zaktivnit{/if}</a>
+                        <a href="{plink Post:delete, $post->getId()}">Smazat</a>
+                    {/if}
+                </small>
+            </p>
+        </div>
+    {/foreach}
+{/if}

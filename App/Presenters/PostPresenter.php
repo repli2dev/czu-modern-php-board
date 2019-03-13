@@ -20,6 +20,51 @@ final class PostPresenter extends Nette\Application\UI\Presenter
         }
     }
 
+    public function actionToggle(int $id): void
+    {
+        if (!$this->user->isLoggedIn()) {
+            $this->redirect('Homepage:');
+        }
+        $postRepository = $this->entityManager->getRepository(Post::class);
+        /** @var Post $post */
+        $post = $postRepository->find($id);
+        if ($post === null) {
+            throw new Nette\Application\BadRequestException();
+        }
+        if ($post->getUser()->getId() !== $this->user->getId()) {
+            throw new Nette\Application\ForbiddenRequestException();
+        }
+        $post->toggleActive();
+        $this->entityManager->persist($post);
+        $this->entityManager->flush();
+        if ($post->isActive()) {
+            $this->flashMessage('Příspěvek zaktivněn.');
+        } else {
+            $this->flashMessage('Příspěvek zneaktivněn.');
+        }
+        $this->redirect('Homepage:');
+    }
+
+    public function actionDelete(int $id): void
+    {
+        if (!$this->user->isLoggedIn()) {
+            $this->redirect('Homepage:');
+        }
+        $postRepository = $this->entityManager->getRepository(Post::class);
+        /** @var Post $post */
+        $post = $postRepository->find($id);
+        if ($post === null) {
+            throw new Nette\Application\BadRequestException();
+        }
+        if ($post->getUser()->getId() !== $this->user->getId()) {
+            throw new Nette\Application\ForbiddenRequestException();
+        }
+        $this->entityManager->remove($post);
+        $this->entityManager->flush();
+        $this->flashMessage('Příspěvek smazán.');
+        $this->redirect('Homepage:');
+    }
+
     public function createComponentPostForm(): Nette\Application\UI\Form
     {
         $form = new Nette\Application\UI\Form();

@@ -108,4 +108,9 @@ class Post
     {
         return $this->user;
     }
+
+    public function toggleActive(): void
+    {
+        $this->active = !$this->active;
+    }
 }
