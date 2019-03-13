@@ -1,0 +1,36 @@
+parameters:
+
+
+application:
+    errorPresenter: Error
+    mapping:
+        *: App\*Module\Presenters\*Presenter
+
+
+session:
+    autoStart: true
+    cookieSecure: false # Only for localhost!
+    expiration: 14 days
+
+
+services:
+    router: App\Router\RouterFactory::createRouter
+
+extensions:
+    console: Contributte\Console\DI\ConsoleExtension(%consoleMode%)
+    dbal: Nettrine\DBAL\DI\DbalExtension
+    orm: Nettrine\ORM\DI\OrmExtension
+    orm.annotations: Nettrine\ORM\DI\OrmAnnotationsExtension
+    orm.console: Nettrine\ORM\DI\OrmConsoleExtension
+
+orm.annotations:
+    paths:
+        - App/Model/Entity
+
+console:
+    name: ČZU Modern PHP demo
+    version: 1.0
+    catchExceptions: false
+    autoExit: true
+    url: https://example.com
+    lazy: false

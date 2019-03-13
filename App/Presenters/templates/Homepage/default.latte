@@ -1,0 +1,11 @@
+{block content}
+
+<p>
+    {if $user->isLoggedIn()}
+        Jste přihlášení jako {$user->getIdentity()->username}, <a href="{plink User:logout}">odhlásit</a>.
+    {else}
+        <a href="{plink User:login}">Přihlásit</a>
+    {/if}
+</p>
+
+Zde bude nástěnka
