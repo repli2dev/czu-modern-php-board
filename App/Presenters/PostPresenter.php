@@ -1,11 +1,18 @@
 <?php declare(strict_types=1);
 namespace App\Presenters;
 
+use App\Model\Entity\Post;
+use App\Model\Entity\User;
+use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
 use Nette;
 
 
 final class PostPresenter extends Nette\Application\UI\Presenter
 {
+    /** @var EntityManagerInterface @inject */
+    public $entityManager;
+
     public function actionNew(): void
     {
         if (!$this->user->isLoggedIn()) {
@@ -31,6 +38,29 @@ final class PostPresenter extends Nette\Application\UI\Presenter
             if (!$this->user->isLoggedIn()) {
                 throw new Nette\Application\ForbiddenRequestException();
             }
+            // Find user using repository
+            $userRepository = $this->entityManager->getRepository(User::class);
+
+            /** @var User $userEntity */
+            $userEntity = $userRepository->find($this->user->getId());
+
+            $post = new Post(
+                $values->type,
+                $values->title,
+                $values->content,
+                new DateTime(),
+                true,
+                $userEntity
+            );
+            // Stage all changes to be saved on flush
+            $this->entityManager->persist($post);
+
+            // Flush (save) staged data to the database
+            $this->entityManager->flush();
+
+            // Show success message and redirect (to prevent duplicate insertions caused by F5)
+            $this->flashMessage('Příspěvek byl vložen.', 'success');
+            $this->redirect('Homepage:');
         };
 
         return $form;
